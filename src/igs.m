@@ -1,23 +1,32 @@
 % Implementation of incomplete Gram-Schmidt process
 % i.e. only does the projections to the p preceeding vectors
+% NOTE! Does the process for the transpose of A i.e. orthogonalises
+% the rows rather than the columns
 
 function E = igs(A, p)
 
-    E = zeros(size(A));
-    ncols = size(A, 2);
+    E = A;
+    nrows = size(A, 1);
 
-    E(:, 1) = A(:, 1) / norm(A(:, 1));
+    for k=1:p:nrows
 
-    for k=2:ncols
+      p0 = min([nrows - k, p]);
 
-        p0 = min([k, p]);
-        E(:, k) = A(:, k);
+      E(k, :) = E(k, :) / norm(E(k, :));
     
-        for i = 1:p0 - 1
-            E(:, k) = E(:, k) - proj(A(:, k), E(:, k - i));
-        end
+      for i = 1:p0 - 1
 
-        E(:, k) = E(:, k) / norm(E(:, k));
+	for j = 1:i
+
+	  E(k + i, :) = E(k + i, :) - proj(A(k + i, :), E(k + i - j, :));
+	  
+	end
+
+	E(k, :) = E(k, :) / norm(E(k, :));
+	
+      end
 
     end
+    
 end
+

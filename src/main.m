@@ -2,6 +2,8 @@
 % The data folder contains the sparse representations of the coefficient matrix A
 % and vector b for a Poisson problem on WinkelStructured geometry
 
+disp("\nReading the data")
+
 A = dlmread("data/linsys_a.dat");
 b = dlmread("data/linsys_b.dat");
 
@@ -18,10 +20,10 @@ b = spconvert(b);
 param = 1;
 disp(["\nSolving the problem with CGNR + ILQ {", num2str(param), "} ... \n"])
 
-x0 = zeros(size(b));
+x0 = sparse(zeros(size(b)));
 
 tic
-x = cgnr_ilq(A, x0, b, 1000, 0.00001, param);
+x = cgnr_ilq(A, x0, b, 1000, 0.000001, param, false);
 toc
 
 disp(["Residual norm: ", num2str(norm(b - A * x))])
@@ -29,12 +31,25 @@ disp(["Residual norm: ", num2str(norm(b - A * x))])
 
 % Solve the problem with regular cg
 
-disp("\nSolving the problem with CG ... \n")
+% disp("\nSolving the problem with CG ... \n")
 
-x0 = zeros(size(b));
+% x0 = zeros(size(b));
+
+% tic
+% x = cg(A, x0, b, 10000, 0.000001);
+% toc
+
+% disp(["Residual norm: ", num2str(norm(b - A * x))])
+
+
+% Solve the problem with cgnr
+
+disp("\nSolving the problem with CGNR ... \n")
+
+x0 = sparse(zeros(size(b)));
 
 tic
-x = cg(A, x0, b, 1000, 0.00001);
+x = cgnr(A, x0, b, 10000, 0.000001);
 toc
 
 disp(["Residual norm: ", num2str(norm(b - A * x))])

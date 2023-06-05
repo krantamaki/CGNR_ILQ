@@ -2,13 +2,13 @@
 % as a chain of matrix vector multiplications rather than matrix matrix
 % multiplications
 
-function x = ilq_mult(A_T, L_T, L, A, x0)
+function x = ilq_mult(A, L, x0)
  
     x = x0;
 
     x = A * x;
-    x = L * x;
-    x = L_T * x;
-    x = A_T * x;
+    x = trilsolve(L, x);
+    x = triulsolve(L, x);
+    x = (x' * A)';
 
 end

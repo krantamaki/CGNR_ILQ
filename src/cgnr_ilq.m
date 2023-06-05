@@ -1,34 +1,47 @@
 % Implementation of CGNR linear solver with ILQ preconditioning
 
-function x = cgnr_ilq(A, x0, b, max_iter, tol, param)
+function x = cgnr_ilq(A, x0, b, max_iter, tol, param, comp_cond)
+  
+    L = ilq(A, param);
 
-    A_T = A';
-    L = ilq(A_T, param);
-    L = inv_L(L, param);
-    % L = inv(L)
-    L_T = L';
+    if comp_cond
+      disp("\nComputing the condition numbers. This will take a while...\n")
+
+      condA = cond(A);
+
+      disp(["Condition number of A: ", num2str(condA)])
+
+      disp(["Condition number of system of normal equations: ", num2str(condA ^ 2)])
+
+      L_inv = inv(L);
+      
+      disp(["Condition number of preconditioned system: ", num2str(cond(A' * L_inv' * L_inv * A)), "\n"])
+
+    end
   
     x = x0;
 
-    b_tmp = L * b;
-    b_tmp = L_T * b_tmp;
-    b_tmp = A_T * b_tmp;
+    b_tmp = trilsolve(L, b);
+    b_tmp = triulsolve(L, b_tmp);
+    b_tmp = (b_tmp' * A)';
 
-    r = b_tmp - ilq_mult(A_T, L_T, L, A, x);
+    r = b_tmp - ilq_mult(A, L, x);
     p = r;
 
     for iter = 1:max_iter
 
-        p_tmp = ilq_mult(A_T, L_T, L, A, p);
+        disp(["Iteration: ", num2str(iter)])
+
+        p_tmp = ilq_mult(A, L, p);
       
-        alpha = dot(p, r) / dot(p, p_tmp);
+        alpha = (p' * r) / (p' * p_tmp);
 
 	x = x + alpha * p;
 
 	r_tmp = r;
 
 	r = r - alpha * p_tmp;
-	p = r + dot(r, r) / dot(r_tmp, r_tmp) * p;
+	p = r + (r' * r) / (r_tmp' * r_tmp) * p;
 
 	if (norm(r) < tol)
 	    disp(["Required number of iterations: ", num2str(iter)])

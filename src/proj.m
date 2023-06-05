@@ -2,6 +2,6 @@
 
 function p = proj(a, u)
 
-    p = (dot(a, u) / dot(u, u)) * u;
+    p = ((a * u') / (u * u')) * u;
 
 end
