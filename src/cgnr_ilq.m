@@ -2,7 +2,7 @@
 
 function x = cgnr_ilq(A, x0, b, max_iter, tol, param, comp_cond)
   
-    L = ilq(A, param);
+    [L, Q] = milq(A, param);
 
     if comp_cond
       disp("\nComputing the condition numbers. This will take a while...\n")

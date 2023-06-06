@@ -17,7 +17,7 @@ b = spconvert(b);
 
 
 % Solve the problem with cgnr_ilq
-param = 1;
+param = 10;
 disp(["\nSolving the problem with CGNR + ILQ {", num2str(param), "} ... \n"])
 
 x0 = sparse(zeros(size(b)));
